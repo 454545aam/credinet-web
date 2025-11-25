@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrediNet - Financia tu Educación</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+   <style>/* <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">*/</style>
+    
+
+    
+    <style>
+        :root {
+            --color-primary-dark: #333333; /* Gris oscuro para header/footer */
+            --color-secondary-light: #FFFFFF; /* Blanco para fondo del contenido */
+            --color-accent-green: #5cb85c; /* Verde para acciones primarias */
+            --color-text-dark: #333333; /* Texto oscuro */
+            --color-text-light: #f5f5f5; /* Texto claro */
+            --color-background: #f0f0f0; /* Fondo general */
+            --color-card-bg: #f9f9f9; /* Fondo de tarjetas */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-background);
+        }
+
+        /* --- Header / Navegación --- */
+        .header {
+            background-color: var(--color-primary-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 80px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-light);
+        }
+
+        .nav-links a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-accent-green);
+        }
+
+        .btn-solicitar {
+            background-color: var(--color-accent-green);
+            color: var(--color-secondary-light) !important;
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin-left: 30px; /* Separación del último link */
+        }
+
+        .btn-solicitar:hover {
+            background-color: #4cae4c;
+        }
+
+        /* --- Banner Principal --- */
+        .hero-banner {
+            background-color: var(--color-secondary-light);
+            padding: 80px 80px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Botón principal grande para Login/Solicitar */
+        .btn-main-action {
+            display: inline-block;
+            background-color: var(--color-accent-green);
+            color: var(--color-secondary-light);
+            padding: 15px 40px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-main-action:hover {
+            background-color: #4cae4c;
+            transform: translateY(-2px);
+        }
+        
+        /* --- Secciones de Contenido (Cómo Funciona) --- */
+        .section-how-it-works {
+            max-width: 1000px;
+            margin: 60px auto;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 30px;
+            font-weight: 500;
+            color: var(--color-text-dark);
+            margin-bottom: 40px;
+        }
+
+        .steps-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 30px;
+        }
+
+        .step-card {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--color-card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-icon {
+            font-size: 40px;
+            color: var(--color-accent-green);
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-text-dark);
+            margin-bottom: 10px;
+        }
+
+        .step-description {
+            font-size: 14px;
+            color: #666;
+        }
+
+     
+        .footer {
+            background-color: var(--color-primary-dark);
+            color: var(--color-text-light);
+            text-align: center;
+            padding: 20px 0;
+            font-size: 13px;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: var(--color-accent-green);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+
+
+    </style>
+</head>
+<style>  
+ /* <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('✅ Service Worker registrado con éxito:', reg.scope))
+        .catch(err => console.error('❌ Error al registrar el Service Worker:', err));
+    });
+  }
+</script>-- */
+</style>
+<body>
+
+
+
+    <header class="header">
+        <div class="logo">C CrediNet</div>
+        <nav class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Beneficios</a>
+            <a href="#">Requisitos</a>
+            <a href="#" class="btn-solicitar">Solicitar Crédito</a>
+        </nav>
+    </header>
+
+    <div class="hero-banner">
+        <h1 class="hero-title">Impulsa tu Futuro. CrediNet te Apoya.</h1>
+        <p class="hero-subtitle">Financiamiento educativo flexible, diseñado por y para estudiantes.</p>
+        
+         <a  class="btn-main-action ...">Revision de crédito</a>
+         <a class="btn-main-action ...">Credinet sodoku</a>
+           
+    </div>
+   
+    <section class="section-how-it-works">
+        <h2 class="section-title">¿Cómo funciona CrediNet?</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">📝</div>
+                <div class="step-title">1. Regístrate y Solicita</div>
+                <p class="step-description">Completa nuestro formulario con tu información académica y el monto que necesitas.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">🔍</div>
+                <div class="step-title">2. Evaluación Rápida</div>
+                <p class="step-description">Nuestro sistema evalúa tu solicitud en menos de 24 horas. ¡Sin burocracia!</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">💰</div>
+                <div class="step-title">3. Juega y reduce tu saldo</div>
+                <p class="step-description">Tras la aprobación, el saldo se puede ser modificado.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        © 2025 CrediNet | Proyecto Escolar
+        <a href="#">Aviso Legal</a> | <a href="#">Política de Privacidad</a> | <a href="#">Contacto</a>
+    </footer>
+       <h1>Usuarios</h1>
+
+    <form method="POST">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <ul>
+        {% for id, nombre in usuarios %}
+            <li>{{ id }} - {{ nombre }}</li>
+        {% endfor %}
+    </ul>
+    </body>
+</html>
