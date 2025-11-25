@@ -1,11 +1,15 @@
 from flask import Flask, request, render_template
 import psycopg2
 import os
+import urllib.parse as up
 
 app = Flask(__name__)
 
 def get_connection():
-    return psycopg2.connect(os.environ["DATABASE_URL"])
+    db_url = os.environ["DATABASE_URL"]
+
+    # Render PostgreSQL requiere SSL obligatorio
+    return psycopg2.connect(db_url, sslmode="require")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
