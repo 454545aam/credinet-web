@@ -134,5 +134,125 @@
     {% if now is not defined %}
     {% set now = datetime.now() %}
     {% endif %}
+
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Avanzado de Barra de Crédito</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f2f5;
+    }
+    .simulador {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input[type="range"], input[type="number"] {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: right;
+    }
+    th {
+      background: #eee;
+    }
+  </style>
+
+  <div class="simulador">
+    <h2>Simulador Avanzado de Barra de Crédito</h2>
+    
+    <label for="credito">Monto usado de la barra de crédito (USD):</label>
+    <input type="range" id="credito" min="0" max="10000" step="100" value="0">
+    <span id="montoSeleccionado">0</span> USD
+
+    <label for="tasa">Tasa de interés mensual (%):</label>
+    <input type="number" id="tasa" min="0" max="100" step="0.1" value="2">
+
+    <label for="meses">Número de meses:</label>
+    <input type="number" id="meses" min="1" max="60" step="1" value="12">
+
+    <button id="calcular">Calcular plan de pagos</button>
+
+    <div id="resultado">
+      <!-- Tabla de pagos generada aquí -->
+    </div>
+  </div>
+
+  <script>
+    const credito = document.getElementById('credito');
+    const montoSeleccionado = document.getElementById('montoSeleccionado');
+    const tasaInput = document.getElementById('tasa');
+    const mesesInput = document.getElementById('meses');
+    const calcularBtn = document.getElementById('calcular');
+    const resultadoDiv = document.getElementById('resultado');
+
+    credito.addEventListener('input', () => {
+      montoSeleccionado.textContent = Number(credito.value).toLocaleString();
+    });
+
+    function calcularPlan() {
+      const capital = Number(credito.value);
+      const tasa = Number(tasaInput.value) / 100;
+      const meses = Number(mesesInput.value);
+
+      let saldo = capital;
+      let tablaHTML = `
+        <table>
+          <tr>
+            <th>Mes</th>
+            <th>Capital Inicial</th>
+            <th>Interés</th>
+            <th>Pago</th>
+            <th>Capital Restante</th>
+          </tr>
+      `;
+
+      // Pago mensual fijo usando fórmula de amortización
+      const pagoMensual = (capital * tasa) / (1 - Math.pow(1 + tasa, -meses));
+
+      for (let mes = 1; mes <= meses; mes++) {
+        const interes = saldo * tasa;
+        let capitalPagado = pagoMensual - interes;
+        saldo -= capitalPagado;
+        if (saldo < 0) saldo = 0;
+
+        tablaHTML += `
+          <tr>
+            <td>${mes}</td>
+            <td>${(saldo + capitalPagado).toFixed(2)}</td>
+            <td>${interes.toFixed(2)}</td>
+            <td>${pagoMensual.toFixed(2)}</td>
+            <td>${saldo.toFixed(2)}</td>
+          </tr>
+        `;
+
+        if (saldo === 0) break;
+      }
+
+      tablaHTML += `</table>`;
+      resultadoDiv.innerHTML = tablaHTML;
+    }
+
+    calcularBtn.addEventListener('click', calcularPlan);
+  </script>
+
 </body>
 </html>
