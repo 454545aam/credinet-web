@@ -1,23 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registro Básico</title>
-</head>
-<body>
-    <h1>Usuarios</h1>
 
-    <form method="POST">
-        <input type="text" name="nombre" placeholder="Nombre" required>
-        <button type="submit">Guardar</button>
-    </form>
-
-    <ul>
-        {% for id, nombre in usuarios %}
-            <li>{{ id }} - {{ nombre }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -214,7 +195,18 @@
 </script>-- */
 </style>
 <body>
+   <h1>Usuarios</h1>
 
+    <form method="POST">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <ul>
+        {% for id, nombre in usuarios %}
+            <li>{{ id }} - {{ nombre }}</li>
+        {% endfor %}
+    </ul>
 
 
     <header class="header">
