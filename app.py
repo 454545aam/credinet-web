@@ -29,5 +29,24 @@ def index():
 
     return render_template("index.html", usuarios=usuarios)
 
+@app.route('/tablero_alumno')
+def tablero_alumno():
+    return render_template('tablero_alumno.html')
+
+@app.route('/juego')
+def juego():
+    return render_template('juego.html')
+
+
+@app.route('/admin_registros')
+def admin_registros():
+    return render_template('admin_registros.html')
+
+@app.route("/home")
+def home():
+   
+    return render_template("homeshell.html")
+ 
+
 if __name__ == "__main__":
     app.run(debug=True)
