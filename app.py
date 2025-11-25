@@ -93,6 +93,9 @@ def init_db():
 @app.route("/")
 def home():
     return render_template("homeshell.html")
+@app.route("/juego")
+def juego ():
+    return render_template("juego.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

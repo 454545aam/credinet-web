@@ -211,11 +211,18 @@
         <h1 class="hero-title">Impulsa tu Futuro. CrediNet te Apoya.</h1>
         <p class="hero-subtitle">Financiamiento educativo flexible, diseñado por y para estudiantes.</p>
         
-         <a  class="btn-main-action ...">Revision de crédito</a>
-         <a class="btn-main-action ...">Credinet sodoku</a>
+         <a onclick="login()" class="btn-main-action ...">Revision de crédito</a>
+         <a onclick="juego()" class="btn-main-action ...">Credinet sodoku</a>
            
     </div>
-   
+   <script>
+    function login(){
+        window.location.href="/login";
+    }
+     function juego(){
+        window.location.href="/juego";
+    }
+   </script>
     <section class="section-how-it-works">
         <h2 class="section-title">¿Cómo funciona CrediNet?</h2>
         <div class="steps-grid">

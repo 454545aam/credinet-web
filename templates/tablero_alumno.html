@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Estado de Cuenta - CODENOVA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .dashboard-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h2 {
+            color: #1a73e8;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        h3 {
+            color: #555;
+            margin-top: 0;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .info-item {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f8f8;
+            border-left: 4px solid #1a73e8;
+        }
+        .info-item label {
+            display: block;
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 3px;
+        }
+        .info-item p {
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+        .deuda-box {
+            background: #dc3545; /* Rojo para la deuda */
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        .deuda-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        .deuda-box .monto {
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .logout-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .logout-link:hover {
+            color: #004d99;
+        }
+        .message {
+            color: #dc3545;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-card">
+        <h2>Bienvenido, {{ nombre | default('Alumno') }}</h2>
+        <h3>Estado de Cuenta CODENOVA</h3>
+
+        {% if msg %}
+            <!-- Mensaje si la ficha de alumno no ha sido asignada -->
+            <p class="message">{{ msg }}</p>
+        {% endif %}
+
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Matrícula</label>
+                <p>{{ matricula | default('N/A') }}</p>
+            </div>
+            <div class="info-item">
+                <label>Carrera</label>
+                <p>{{ carrera | default('N/A') }}</p>
+            </div>
+            <div class="info-item">
+                <label>Semestre</label>
+                <p>{{ semestre | default('N/A') }}</p>
+            </div>
+            <div class="info-item">
+                <label>Fecha de Consulta</label>
+                <!-- Formatea la fecha actual de forma simple -->
+                <p>{{ now().strftime("%d/%m/%Y") }}</p>
+                {% set now = now() %}
+            </div>
+        </div>
+
+        <div class="deuda-box">
+            <h4>DEUDA PENDIENTE</h4>
+            <!-- Formatea la deuda a dos decimales -->
+            <p class="monto">${{ "{:,.2f}".format(deuda | default(0.00) | float) }}</p>
+        </div>
+
+        <a href="/" class="logout-link">Cerrar Sesión</a>
+    </div>
+
+    <!-- Script para obtener la fecha actual en el template (función Jinja) -->
+    {% if now is not defined %}
+    {% set now = datetime.now() %}
+    {% endif %}
+</body>
+</html>
