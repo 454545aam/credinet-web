@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sudoku de Fútbol — La Deuda Universitaria</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- SweetAlert2 para modales bonitos -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="branding">
+        <div class="logo-circle"></div>
+        <div>
+          <h1>Sudoku de Fútbol</h1>
+          <p class="subtitle">La Deuda Universitaria</p>
+        </div>
+      </div>
+
+      <div class="top-controls">
+        <label>Dificultad
+          <select id="difficulty">
+            <option value="easy">Fácil</option>
+            <option value="medium" selected>Medio</option>
+            <option value="hard">Difícil</option>
+          </select>
+        </label>
+        <button id="btn-start">Iniciar Ronda</button>
+        <button id="btn-check" disabled>Comprobar</button>
+        <button id="btn-skip" disabled>Rendirse / Saltar</button>
+        <button id="btn-descargar" >Descargar</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="left-panel">
+        <div class="stats card">
+          <div class="stat-row">
+            <div>
+              <div class="label">⏱ Tiempo</div>
+              <div id="timer">00:00</div>
+            </div>
+            <div>
+              <div class="label">⭐ Puntuación</div>
+              <div id="score">0</div>
+            </div>
+            <div>
+              <div class="label">Ronda</div>
+              <div id="round">0</div>
+            </div>
+          </div>
+          <div class="progress">
+            <div class="label">Meta: Liquidar deuda</div>
+            <div class="meta">Tu deuda restante: $ <span id="your-debt">0</span></div>
+          </div>
+        </div>
+
+        <div class="players card">
+          <h3>Competidores</h3>
+          <ul id="players-list">
+            <!-- Se llena desde JS -->
+          </ul>
+        </div>
+
+        <div class="instructions card">
+          <h3>Instrucciones</h3>
+          <p>Resuelve el sudoku lo más rápido posible. El primero en terminar la ronda recibe un bono que reduce su deuda; los demás reciben un aumento por fallo o demora. Gana quien alcance deuda ≤ $0.</p>
+          <p>Usa el botón <b>Comprobar</b> cuando creas que terminaste.</p>
+        </div>
+      </section>
+
+      <section class="board-area">
+        <div id="board" class="board"></div>
+      </section>
+    </main>
+
+    <footer>
+      <small>Desarrollado por equipo codenova </small>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+<style>:root{
+  /* Basado en la paleta de la primera imagen (verdes suaves y fondo claro) */
+  --bg:#f3f6f3;        /* fondo general muy claro */
+  --panel:#e9f5ec;     /* panel claro */
+  --accent:#256a3a;    /* verde principal oscuro */
+  --accent-2:#66bb6a;  /* verde suave */
+  --accent-3:#b9f6ca;  /* verde pálido */
+  --muted:#6b796f;
+  --text:#10221a;
+  --glass: rgba(255,255,255,0.6);
+  --card-shadow: 0 6px 20px rgba(14,40,18,0.08);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,var(--bg),#eaf5ec);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  padding:18px;
+}
+
+/* App container */
+.app{
+  width:1100px;
+  max-width:95%;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* Top bar */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.branding{display:flex;gap:12px;align-items:center}
+.logo-circle{
+  width:56px;height:56px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  box-shadow: 0 6px 18px rgba(37,106,58,0.25);
+  border:3px solid rgba(255,255,255,0.25);
+}
+.branding h1{margin:0;font-size:20px}
+.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+/* Top controls */
+.top-controls{display:flex;align-items:center;gap:10px}
+.top-controls select, .top-controls button{
+  padding:8px 12px;border-radius:8px;border:none;font-weight:600;
+}
+.top-controls select{background:var(--glass)}
+.top-controls button{
+  background:linear-gradient(180deg,var(--accent-2),var(--accent));
+  color:white; cursor:pointer; box-shadow:0 6px 14px rgba(37,106,58,0.16);
+}
+.top-controls button:disabled{opacity:0.5;cursor:not-allowed}
+
+/* Main layout */
+main{display:flex;gap:16px}
+.left-panel{width:300px;display:flex;flex-direction:column;gap:12px}
+.board-area{flex:1;display:flex;align-items:center;justify-content:center}
+
+/* Cards */
+.card{
+  background:var(--panel);
+  padding:12px;border-radius:12px;box-shadow:var(--card-shadow);
+}
+
+/* Stats */
+.stats .stat-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.stats .label{font-size:12px;color:var(--muted)}
+#timer,#score,#round{font-size:20px;font-weight:700;color:var(--accent-2)}
+.progress{margin-top:10px}
+.meta{font-weight:700;color:var(--accent);margin-top:6px}
+
+/* Players list */
+.players ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.players li{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:linear-gradient(180deg,#fff, #f0fff3)}
+.player-avatar{width:38px;height:38px;border-radius:8px;background:var(--accent-3);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+.player-name{font-weight:700}
+.player-debt{margin-left:auto;font-weight:800;color:#b03a2e}
+
+/* Board */
+.board{
+  width:540px; height:540px;
+  display:grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap:6px;
+  padding:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(240,255,244,0.9));
+  border-radius:14px;
+  box-shadow: 0 12px 30px rgba(14,40,18,0.06);
+  border: 2px solid rgba(37,106,58,0.08);
+}
+
+/* Cell styling */
+.cell {
+  width:100%;
+  height:100%;
+  border-radius:10px;
+  border:1px solid rgba(16,34,26,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;color:var(--text);
+  background:white;
+  cursor:text;
+  transition: transform .08s ease, box-shadow .12s ease;
+}
+.cell input{
+  width:100%;height:100%;border:none;background:transparent;text-align:center;font-size:22px;font-weight:700;color:var(--text);
+  outline:none;
+}
+.cell.fixed{background:linear-gradient(180deg,#e8f9e9,#e0f2e5); color:var(--accent-2); cursor:default}
+.cell.focused{box-shadow:0 6px 18px rgba(37,106,58,0.12); transform:translateY(-3px)}
+.cell.error{background: linear-gradient(180deg,#ffebe9,#ffd7d2); color:#900}
+
+/* Thicker borders for 3x3 blocks */
+.board > .cell:nth-child(3n){ border-right:4px solid rgba(37,106,58,0.08); }
+.board > .cell:nth-child(n+55){ /* rows 7-9 bottom border */ }
+.board > .cell:nth-child(1), .board > .cell:nth-child(10), .board > .cell:nth-child(19),
+.board > .cell:nth-child(28), .board > .cell:nth-child(37), .board > .cell:nth-child(46),
+.board > .cell:nth-child(55), .board > .cell:nth-child(64), .board > .cell:nth-child(73){
+  /* left column special? keep default */
+}
+
+/* Footer */
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:6px}
+
+/* Responsive */
+@media (max-width:920px){
+  .app{width:100%}
+  main{flex-direction:column}
+  .left-panel{width:100%;order:2}
+  .board{width:100%;height:auto;grid-auto-rows:60px}
+}
+</style>
+<script>/* Juego: Sudoku de Fútbol — La Deuda Universitaria
+   Lógica completa: generación de tablero (backtracking), creación de puzzle por dificultad,
+   cronómetro, puntuación, simulación de rivales, actualización de deudas por ronda, validación.
+*/
+
+/* --------------------------
+   UTILS (generales)
+   -------------------------- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+/* --------------------------
+   ELEMENTOS DOM
+   -------------------------- */
+const boardEl = $('#board');
+const btnStart = $('#btn-start');
+const btnCheck = $('#btn-check');
+const btnSkip = $('#btn-skip');
+const diffSelect = $('#difficulty');
+const timerEl = $('#timer');
+const scoreEl = $('#score');
+const roundEl = $('#round');
+const playersListEl = $('#players-list');
+const yourDebtEl = $('#your-debt');
+
+/* --------------------------
+   ESTADO DEL JUEGO
+   -------------------------- */
+let gameState = {
+  solvedBoard: null,   // 9x9 array solution
+  puzzleBoard: null,   // 9x9 array with zeros removed
+  cells: [],           // referencias a celdas DOM (81)
+  timer: null,
+  seconds: 0,
+  score: 0,
+  round: 0,
+  difficulty: 'medium',
+  playerIndex: 0,      // el jugador humano (0) vs IA (1..3)
+  players: [           // 4 competidores (0 = tú)
+    { name: 'Daniela', debt: 1200 },
+    { name: 'Daniel', debt: 950 },
+    { name: 'Gonzalo', debt: 800 },
+    { name: 'Jorge', debt: 700 }
+  ],
+  roundActive: false
+};
+
+/* Inicial debts: puedes ajustarlas */
+function initPlayers() {
+  // Si quieres, setea debts dinámicamente
+  // Mantener pequeñas diferencias para dramatismo
+  gameState.players = [
+    { name: 'Daniela', debt: 1200 },
+    { name: 'Daniel', debt: 950 },
+    { name: 'Gonzalo', debt: 800 },
+    { name: 'Jorge', debt: 700 }
+  ];
+  renderPlayers();
+}
+
+/* --------------------------
+   SUDOKU: generador y solver (backtracking)
+   -------------------------- */
+
+/* Crea matriz 9x9 vacía */
+function emptyBoard() {
+  return Array.from({length:9}, () => Array(9).fill(0));
+}
+
+/* Comprueba si es seguro colocar num en board[row][col] */
+function isSafe(board, row, col, num) {
+  for (let i=0;i<9;i++){
+    if (board[row][i] === num) return false;
+    if (board[i][col] === num) return false;
+  }
+  const startRow = row - (row % 3);
+  const startCol = col - (col % 3);
+  for (let r = startRow; r < startRow + 3; r++){
+    for (let c = startCol; c < startCol + 3; c++){
+      if (board[r][c] === num) return false;
+    }
+  }
+  return true;
+}
+
+/* Backtracking solver:
+   devuelve true si llenó el tablero (modifica board in-place) */
+function solveBoard(board) {
+  for (let row=0; row<9; row++){
+    for (let col=0; col<9; col++){
+      if (board[row][col] === 0) {
+        // probar números en orden aleatorio para variación
+        const nums = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+        for (let n of nums){
+          if (isSafe(board,row,col,n)) {
+            board[row][col] = n;
+            if (solveBoard(board)) return true;
+            board[row][col] = 0;
+          }
+        }
+        return false; // no hay número válido -> backtrack
+      }
+    }
+  }
+  return true; // todo lleno
+}
+
+/* Genera un tablero resuelto aleatorio */
+function generateSolvedBoard() {
+  const board = emptyBoard();
+  // Para mejorar la velocidad, precargar la primera fila con permutación
+  board[0] = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+  solveBoard(board);
+  return board;
+}
+
+/* Copia profunda de matriz 9x9 */
+function copyBoard(b) {
+  return b.map(row => row.slice());
+}
+
+/* Quitar celdas según dificultad (número de eliminaciones) */
+function makePuzzleFromSolution(solution, difficulty) {
+  const puzzle = copyBoard(solution);
+  let removals;
+  if (difficulty === 'easy') removals = 36;   // deja ~45 números
+  else if (difficulty === 'medium') removals = 46;
+  else removals = 54;                         // difícil, deja ~27 números
+  // Eliminar en posiciones aleatorias
+  const positions = Array.from({length:81}, (_,i)=>i).sort(()=>Math.random()-0.5);
+  let removed = 0;
+  for (let pos of positions) {
+    if (removed >= removals) break;
+    const r = Math.floor(pos/9), c = pos%9;
+    if (puzzle[r][c] !== 0) {
+      // Para mayor realismo podríamos comprobar unicidad, pero para demo es OK
+      puzzle[r][c] = 0;
+      removed++;
+    }
+  }
+  return puzzle;
+}
+
+/* --------------------------
+   RENDER: dibujar tablero en DOM
+   -------------------------- */
+function renderBoard(puzzle) {
+  boardEl.innerHTML = '';
+  gameState.cells = [];
+  for (let r=0;r<9;r++){
+    for (let c=0;c<9;c++){
+      const cellWrap = document.createElement('div');
+      cellWrap.className = 'cell';
+      // dar clase para bloques 3x3 (solo visual)
+      // mostrar valor o input
+      if (puzzle[r][c] !== 0) {
+        cellWrap.classList.add('fixed');
+        cellWrap.innerHTML = `<div>${puzzle[r][c]}</div>`;
+      } else {
+        const ip = document.createElement('input');
+        ip.type = 'text';
+        ip.inputMode = 'numeric';
+        ip.maxLength = 1;
+        ip.className = 'cell-input';
+        ip.dataset.r = r;
+        ip.dataset.c = c;
+        // eventos
+        ip.addEventListener('input', onCellInput);
+        ip.addEventListener('focus', () => highlightCell(ip, true));
+        ip.addEventListener('blur', () => highlightCell(ip, false));
+        cellWrap.appendChild(ip);
+        gameState.cells.push(ip);
+      }
+      boardEl.appendChild(cellWrap);
+    }
+  }
+}
+
+/* Resalta celda enfocada */
+function highlightCell(ip, focus) {
+  const parent = ip.parentElement;
+  if (focus) parent.classList.add('focused');
+  else parent.classList.remove('focused');
+}
+
+/* --------------------------
+   CONTROL DEL TIEMPO
+   -------------------------- */
+function startTimer() {
+  clearInterval(gameState.timer);
+  gameState.seconds = 0;
+  timerEl.textContent = formatTime(0);
+  gameState.timer = setInterval(() => {
+    gameState.seconds += 1;
+    timerEl.textContent = formatTime(gameState.seconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(gameState.timer);
+}
+
+/* Formatea segundos a mm:ss */
+function formatTime(s) {
+  const m = Math.floor(s/60);
+  const sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+/* --------------------------
+   VALIDACIÓN Y COMPROBACIÓN
+   -------------------------- */
+/* Lee el estado actual del puzzle (0 si vacío o invalido) */
+function readPlayerBoard() {
+  const board = copyBoard(gameState.puzzleBoard);
+  // rellenar con inputs
+  const inputs = $$('.cell-input');
+  for (let ip of inputs){
+    const r = parseInt(ip.dataset.r,10);
+    const c = parseInt(ip.dataset.c,10);
+    const v = ip.value.trim();
+    if (!v) board[r][c] = 0;
+    else {
+      const n = parseInt(v,10);
+      if (!n || n <1 || n>9) board[r][c] = -1; // invalido
+      else board[r][c] = n;
+    }
+  }
+  return board;
+}
+
+/* Compara con solucion y marca errores */
+function validateAgainstSolution(playerBoard, solution) {
+  let allFilled = true;
+  let anyInvalid = false;
+  for (let r=0;r<9;r++){
+    for (let c=0;c<9;c++){
+      if (playerBoard[r][c] === 0) allFilled = false;
+      if (playerBoard[r][c] === -1) anyInvalid = true;
+    }
+  }
+  // marcar errores visuales
+  // recorrer inputs y marcar 'error' si no coinciden con solution
+  $$('.cell-input').forEach(ip=>{
+    const r = parseInt(ip.dataset.r,10);
+    const c = parseInt(ip.dataset.c,10);
+    const parent = ip.parentElement;
+    parent.classList.remove('error');
+    if (!ip.value) return;
+    const v = parseInt(ip.value,10);
+    if (isNaN(v) || solution[r][c] !== v) {
+      parent.classList.add('error');
+    }
+  });
+  // comprobar si hay errores: cualquier '.cell.error' indica fallo
+  const errors = $$('.cell.error').length;
+  return {
+    allFilled,
+    anyInvalid,
+    errorsCount: errors
+  };
+}
+
+
+function simulateOpponentTime(difficulty) {
+  // Baseline mean times (en segundos) por dificultad:
+  const base = { easy: 45, medium: 110, hard: 220 }; // tiempos "promedio" base
+  const variability = { easy: 20, medium: 50, hard: 90 }; // desviación
+  // Los oponentes tienen skill ligeramente distinto
+  const skillFactor = 0.8 + Math.random() * 0.8; // 0.8 a 1.6 (menor = mejor)
+  const mean = base[difficulty] * skillFactor;
+  const sd = variability[difficulty] * (0.6 + Math.random()*0.8);
+  // Sample con aproximación (Box-Muller)
+  const u1 = Math.random(), u2 = Math.random();
+  let z = Math.sqrt(-2*Math.log(u1)) * Math.cos(2*Math.PI*u2);
+  let time = Math.max(8, Math.round(mean + z * sd));
+  return time;
+}
+
+/* --------------------------
+   LÓGICA DE RONDAS Y DEUDAS
+   -------------------------- */
+function startRound() {
+  if (gameState.roundActive) return;
+  gameState.difficulty = diffSelect.value;
+  gameState.round += 1;
+  roundEl.textContent = gameState.round;
+  // generar solucion y puzzle
+  const solution = generateSolvedBoard();
+  gameState.solvedBoard = solution;
+  const puzzle = makePuzzleFromSolution(solution, gameState.difficulty);
+  gameState.puzzleBoard = puzzle;
+  renderBoard(puzzle);
+  // habilitar botones
+  btnCheck.disabled = false;
+  btnSkip.disabled = false;
+  gameState.roundActive = true;
+  // reiniciar y comenzar timer
+  startTimer();
+  // mostrar popup informativo
+  Swal.fire({
+    title: `Ronda ${gameState.round} — ${capitalize(gameState.difficulty)}`,
+    html: `Objetivo: Resuelve el tablero lo más rápido posible. <br><small>El primer jugador finaliza y recibe bono. Otros pueden aumentar deuda.</small>`,
+    icon: 'info',
+    confirmButtonColor: '#256a3a'
+  });
+}
+
+/* Al finalizar la ronda (cuando jugador humano comprueba o se rinde) */
+async function finishRound(playerFinished, playerTimeSeconds, playerCorrect) {
+  // detener timer si está activo
+  stopTimer();
+  gameState.roundActive = false;
+  btnCheck.disabled = true;
+  btnSkip.disabled = true;
+
+  // Simular tiempos de los otros 3 jugadores
+  const opponentTimes = [];
+  for (let i=1;i<4;i++){
+    // si el humano no terminó correctamente, los rivales siguen
+    const t = simulateOpponentTime(gameState.difficulty);
+    opponentTimes.push({ index:i, time:t });
+  }
+
+  // Combinar tiempos: jugador humano (índice 0)
+  const allTimes = [{ index:0, time: playerFinished ? playerTimeSeconds : Infinity, correct: playerCorrect }];
+  opponentTimes.forEach(o => allTimes.push({ ...o, correct:true })); // IA siempre correcta en simulación
+
+  // Ordenar por tiempo asc
+  allTimes.sort((a,b)=>a.time - b.time);
+
+  // Determinar ganador(es): aquellos con tiempo igual al mínimo (tolerancia 1s)
+  const bestTime = allTimes[0].time;
+  const winners = allTimes.filter(p => Math.abs(p.time - bestTime) <= 1 && p.time !== Infinity);
+
+  // Actualizar deudas:
+  // lógica:
+  // - Cada ronda hay un "pool" de reducción (bono) que depende de dificultad y tiempo
+  // - Ganador recibe bono (disminuye deuda). Los demás reciben "penalización" (intereses).
+  const baseBonus = { easy: 200, medium: 350, hard: 550 };
+  const basePenalty = { easy: 50, medium: 120, hard: 220 };
+
+  // bonificación por rapidez: cuanto menor el tiempo, mayor bono
+  const timeFactor = Math.max(0.25, (1 - (gameState.seconds / ( (gameState.difficulty==='easy')?60:(gameState.difficulty==='medium'?180:420) ))));
+  const bonus = Math.round(baseBonus[gameState.difficulty] * (1 + 0.6 * timeFactor));
+  const penalty = basePenalty[gameState.difficulty];
+
+  // aplicar bono dividido si hay empate múltiple
+  const perWinnerBonus = Math.round(bonus / winners.length);
+
+  // mensaje acumulador
+  let summary = `<strong>Ronda ${gameState.round} — Resultados</strong><br>`;
+  summary += `Tu tiempo: ${formatTime(playerTimeSeconds)}<br>`;
+
+  // aplicar cambios
+  for (let winner of winners){
+    const p = gameState.players[winner.index];
+    p.debt = Math.max(0, p.debt - perWinnerBonus);
+    summary += `<span style="color:green">${p.name} ganó y recibió -$${perWinnerBonus}</span><br>`;
+  }
+  // Los que no ganaron reciben penalización proporcional al tiempo perdido
+  for (let i=0;i<gameState.players.length;i++){
+    if (!winners.some(w=>w.index===i)) {
+      // aplicar penalización; si fue el jugador y no terminó correctamente, penal mayor
+      let extra = 0;
+      if (i===0 && !playerCorrect) {
+        extra = Math.round(penalty * 1.5);
+      }
+      gameState.players[i].debt += (penalty + extra);
+    }
+  }
+
+  // Actualizar puntuación del jugador
+  if (playerCorrect) {
+    const difficultyMultiplier = gameState.difficulty === 'easy' ? 1 : gameState.difficulty === 'medium' ? 1.4 : 1.9;
+    const timeBonus = Math.max(0, Math.round((500 - gameState.seconds) * 0.6));
+    const gained = Math.round((100 * difficultyMultiplier) + timeBonus);
+    gameState.score += gained;
+    summary += `<br>Ganaste ${gained} pts. Tiempo bonus: ${timeBonus}<br>`;
+  } else {
+    summary += `<br>No completaste correctamente: no obtuviste puntos adicionales.<br>`;
+  }
+
+  // Mostrar resumen con modal
+  renderPlayers();
+  scoreEl.textContent = gameState.score;
+  yourDebtEl.textContent = gameState.players[0].debt;
+
+  // Comprobar si alguien ya tiene deuda <= 0 (final)
+  const winnersFinal = gameState.players.filter(p => p.debt <= 0);
+  if (winnersFinal.length > 0) {
+    // Fin del juego
+    let winMsg;
+    if (winnersFinal.length === 1) {
+      winMsg = `${winnersFinal[0].name} ha liquidado su deuda y obtiene la graduación!`;
+    } else {
+      winMsg = `¡Final inesperado! Varios jugadores han liquidado su deuda: ${winnersFinal.map(w=>w.name).join(', ')}`;
+    }
+    await Swal.fire({
+      title: 'Fin del Torneo',
+      html: `${summary}<hr><strong>${winMsg}</strong>`,
+      icon: 'success',
+      confirmButtonColor:'#256a3a'
+    });
+    // Reiniciar juego (o preguntar)
+    const r = await Swal.fire({
+      title:'¿Jugar otra vez?',
+      text:'Reiniciar deudas y puntuación.',
+      showCancelButton:true,
+      confirmButtonText:'Reiniciar',
+      cancelButtonText:'Salir'
+    });
+    if (r.isConfirmed) resetGame();
+    else {
+      // deshabilitar botones
+      btnStart.disabled = true;
+      btnCheck.disabled = true;
+      btnSkip.disabled = true;
+    }
+  } else {
+    // Continuar a siguiente ronda
+    await Swal.fire({
+      title:'Ronda finalizada',
+      html: summary,
+      icon: 'info',
+      confirmButtonColor:'#256a3a'
+    });
+  }
+}
+
+/* --------------------------
+   EVENTOS: entrada de celda, manejo
+   -------------------------- */
+function onCellInput(e) {
+  const ip = e.target;
+  // permitir solo números 1-9
+  const val = ip.value.replace(/[^1-9]/g,'').slice(0,1);
+  ip.value = val;
+  // opcional: marcar errores de inmediato comparando con solución
+  if (val) {
+    const r = parseInt(ip.dataset.r,10);
+    const c = parseInt(ip.dataset.c,10);
+    const solVal = gameState.solvedBoard[r][c];
+    const parent = ip.parentElement;
+    parent.classList.remove('error');
+    if (parseInt(val,10) !== solVal) {
+      // no marcar inmediatamente como error para no spoilear; solo subrayar si el usuario quiere
+      // vamos a marcar leve estilo (no destructivo)
+      parent.classList.add('error');
+      setTimeout(()=> parent.classList.remove('error'), 900);
+    }
+  }
+}
+
+/* --------------------------
+   RENDER JUGADORES
+   -------------------------- */
+function renderPlayers() {
+  playersListEl.innerHTML = '';
+  gameState.players.forEach((p, idx) => {
+    const li = document.createElement('li');
+    li.className = 'player-entry';
+    li.innerHTML = `
+      <div class="player-avatar">${p.name[0]}</div>
+      <div class="player-name">${p.name}</div>
+      <div class="player-debt">$ ${p.debt}</div>
+    `;
+    playersListEl.appendChild(li);
+  });
+}
+
+/* --------------------------
+   BOTONES Y CONTROL
+   -------------------------- */
+btnStart.addEventListener('click', () => {
+  if (gameState.roundActive) return;
+  gameState.difficulty = diffSelect.value;
+  startRound();
+});
+
+btnCheck.addEventListener('click', async () => {
+  if (!gameState.roundActive) return;
+  // leer tablero
+  const playerBoard = readPlayerBoard();
+  const { allFilled, anyInvalid, errorsCount } = validateAgainstSolution(playerBoard, gameState.solvedBoard);
+
+  // calcular time
+  const timeSec = gameState.seconds;
+
+  if (!allFilled) {
+    await Swal.fire({ title:'Faltan casillas', text:'Completa todas las celdas antes de verificar.', icon:'warning', confirmButtonColor:'#256a3a' });
+    return;
+  }
+  if (anyInvalid) {
+    await Swal.fire({ title:'Valores inválidos', text:'Hay entradas no numéricas o fuera de rango.', icon:'error', confirmButtonColor:'#b03a2e' });
+    return;
+  }
+
+  // comprobar exactitud comparando tablero completo con solucion
+  let correct = true;
+  for (let r=0;r<9;r++){
+    for (let c=0;c<9;c++){
+      if (playerBoard[r][c] !== gameState.solvedBoard[r][c]) {
+        correct = false;
+        break;
+      }
+    }
+    if (!correct) break;
+  }
+
+  if (correct) {
+    // marca visual de éxito
+    Swal.fire({ title:'¡Correcto!', text:`Completaste en ${formatTime(timeSec)}.`, icon:'success', confirmButtonColor:'#256a3a' });
+    await finishRound(true, timeSec, true);
+  } else {
+    // Si está incorrecto, dar opción: intentar corregir o forzar terminar (penal)
+    const resp = await Swal.fire({
+      title:'Hay errores',
+      html:'Tu tablero no coincide con la solución. ¿Quieres revisar o forzar finalizar la ronda (penalización)?',
+      showCancelButton:true,
+      confirmButtonText:'Forzar finalizar',
+      cancelButtonText:'Revisar',
+      icon:'error',
+      confirmButtonColor:'#b03a2e'
+    });
+    if (resp.isConfirmed) {
+      // Forzar terminar sin premio
+      await finishRound(true, timeSec, false);
+    } else {
+      // dejar que el jugador corrija
+    }
+  }
+});
+
+btnSkip.addEventListener('click', async () => {
+  if (!gameState.roundActive) return;
+  const r = await Swal.fire({
+    title:'¿Rendirse / Saltar ronda?',
+    text:'Si te rindes se aplicará penalización adicional.',
+    showCancelButton:true,
+    confirmButtonText:'Sí, rendirme',
+    cancelButtonText:'Cancelar',
+    icon:'warning',
+    confirmButtonColor:'#b03a2e'
+  });
+  if (r.isConfirmed) {
+    stopTimer();
+    const elapsed = gameState.seconds;
+    await finishRound(false, elapsed, false);
+  }
+});
+
+/* --------------------------
+   OTRAS FUNCIONES
+   -------------------------- */
+function capitalize(s) {
+  if (!s) return s;
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+/* Reinicia el juego completamente */
+function resetGame() {
+  gameState.score = 0;
+  gameState.round = 0;
+  gameState.seconds = 0;
+  gameState.solvedBoard = null;
+  gameState.puzzleBoard = null;
+  gameState.roundActive = false;
+  initPlayers();
+  scoreEl.textContent = gameState.score;
+  roundEl.textContent = gameState.round;
+  timerEl.textContent = formatTime(0);
+  yourDebtEl.textContent = gameState.players[0].debt;
+  boardEl.innerHTML = '';
+  btnCheck.disabled = true;
+  btnSkip.disabled = true;
+}
+
+/* START */
+/* START */
+(async function boot() {
+  // Paso 1: lista de personajes disponibles
+  const personajes = [
+    { name: 'Daniela', debt: 1200 },
+    { name: 'Daniel', debt: 950 },
+    { name: 'Gonzalo', debt: 800 },
+    { name: 'Jorge', debt: 700 }
+  ];
+
+  // Paso 2: pedir al jugador que elija su personaje
+  const { value: elegido } = await Swal.fire({
+    title: 'Elige tu personaje',
+    input: 'select',
+    inputOptions: {
+      'Daniela': 'Daniela 💚',
+      'Daniel': 'Daniel ⚽',
+      'Gonzalo': 'Gonzalo 🧩',
+      'Jorge': 'Jorge 🕹️'
+    },
+    inputPlaceholder: 'Selecciona un jugador',
+    confirmButtonText: 'Aceptar',
+    confirmButtonColor: '#256a3a',
+    allowOutsideClick: false
+  });
+
+  // Si no elige nada, forzar a Daniela por defecto
+  const personajeElegido = elegido || 'Daniela';
+
+  // Paso 3: colocar el personaje elegido como el jugador humano (posición 0)
+  const jugadores = personajes.map(p => ({ ...p })); // copia
+  // mover el elegido al índice 0
+  const idx = jugadores.findIndex(p => p.name === personajeElegido);
+  const [player] = jugadores.splice(idx, 1);
+  jugadores.unshift(player);
+
+  gameState.players = jugadores;
+  gameState.playerIndex = 0;
+
+  // Paso 4: iniciar los valores base
+  scoreEl.textContent = gameState.score;
+  roundEl.textContent = gameState.round;
+  yourDebtEl.textContent = gameState.players[0].debt;
+  renderPlayers();
+
+  // Paso 5: mostrar mensaje de bienvenida personalizado
+  await Swal.fire({
+    title: 'Sudoku de Fútbol — La Deuda Universitaria',
+    html: `<p>Bienvenido/a. Eres <b>${player.name}</b>. 
+    Tu objetivo: liquidar tu deuda antes que los demás.<br>
+    Selecciona la dificultad e inicia la primera ronda.</p>`,
+    icon: 'info',
+    confirmButtonColor: '#256a3a'
+  });
+})();
+
+/* Guarda el estado del juego (deudas, puntuación, ronda) */
+function saveGameState() {
+  const data = {
+    players: gameState.players,
+    score: gameState.score,
+    round: gameState.round
+  };
+  localStorage.setItem('sudokuFutbolState', JSON.stringify(data));
+}
+
+/* Carga el estado guardado (si existe) */
+function loadGameState() {
+  const saved = localStorage.getItem('sudokuFutbolState');
+  if (!saved) return false;
+  try {
+    const data = JSON.parse(saved);
+    if (data.players) {
+      gameState.players = data.players;
+      gameState.score = data.score || 0;
+      gameState.round = data.round || 0;
+      renderPlayers();
+      scoreEl.textContent = gameState.score;
+      roundEl.textContent = gameState.round;
+      yourDebtEl.textContent = gameState.players[0].debt;
+      return true;
+    }
+  } catch (e) {
+    console.warn('Error cargando datos guardados:', e);
+  }
+  return false;
+}
+
+/* Ajusta las deudas de los rivales aleatoriamente cada 30 s */
+function fluctuateOpponentDebts() {
+  if (!gameState.players || gameState.players.length <= 1) return;
+
+  for (let i = 1; i < gameState.players.length; i++) {
+    const rival = gameState.players[i];
+    // Cambia aleatoriamente entre -100 y +150
+    const cambio = randomInt(-100, 150);
+    rival.debt = Math.max(0, rival.debt + cambio);
+  }
+
+  renderPlayers();
+  saveGameState();
+
+  // Aviso visual (opcional)
+  Swal.fire({
+    title: '💰 Mercado inestable',
+    text: 'Las deudas de los rivales han cambiado.',
+    toast: true,
+    position: 'top-end',
+    timer: 2500,
+    showConfirmButton: false,
+    background: '#e9f5ec',
+    color: '#256a3a'
+  });
+}
+
+/* Iniciar chequeo de fluctuación cada 30 segundos */
+setInterval(fluctuateOpponentDebts, 30000);
+
+/* Intentar cargar progreso guardado al abrir el juego */
+loadGameState();
+
+</script>
+
+
+<script>
+    document.getElementById('btn-descargar').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = window.location.href; // mismo archivo actual
+  a.download = 'juego.html'; // nombre del archivo descargado
+  a.click();
+});
+
+</script>
