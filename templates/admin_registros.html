@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - CrediNet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+   <style>/* <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">*/</style>
+    
+    <style>
+        /* <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">*/
+        /* --- Variables de CrediNet --- */
+        /* ------------------------ */
+        :root {
+            --color-primary-dark: #333333;
+            --color-secondary-light: #FFFFFF;
+            --color-accent-green: #5cb85c;
+            --color-accent-green-dark: #4cae4c;
+            --color-text-dark: #333333;
+            --color-background: #f0f0f0;
+            --color-warning-orange: #f0ad4e;
+            --color-danger-red: #d9534f;
+            --color-border-light: #e0e0e0;
+        }
+
+        * {
+            font-family: 'Roboto', sans-serif; 
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: var(--color-background); 
+            padding: 20px; 
+            color: var(--color-text-dark);
+        }
+
+        /* ------------------------ */
+        /* --- 1. Header / Barra Superior --- */
+        /* ------------------------ */
+        .header {
+            background-color: var(--color-secondary-light);
+            padding: 15px 25px;
+            margin-bottom: 25px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--color-primary-dark);
+        }
+        .header h1 {
+            color: var(--color-primary-dark);
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .logout-link a {
+            color: var(--color-danger-red);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border: 1px solid var(--color-danger-red);
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .logout-link a:hover {
+            background: var(--color-danger-red);
+            color: var(--color-secondary-light);
+        }
+
+        /* ------------------------ */
+        /* --- 2. Contenedor Principal (Bloque) --- */
+        /* ------------------------ */
+        .dashboard-container {
+            display: block; 
+        }
+
+        /* ****************************************************** */
+        /* *** CONTENEDOR DE FORMULARIOS LADO A LADO (NUEVO) *** */
+        /* ****************************************************** */
+        .form-container-wrapper {
+            display: flex;
+            gap: 20px; /* Espacio entre los dos formularios */
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        
+        /* ------------------------ */
+        /* --- 3. Secciones de Contenido (Base) --- */
+        /* ------------------------ */
+        .form-section, .register-section {
+            /* Los formularios ocuparán el 50% del contenedor padre (.form-container-wrapper) */
+            flex: 1; /* Permite que ambos crezcan y compartan el espacio */
+            min-width: 300px; /* Asegura un mínimo de ancho para evitar colapso */
+            
+            background: var(--color-secondary-light);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .table-section {
+            width: 100%; 
+            background: var(--color-secondary-light);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px; 
+        }
+        
+        .form-section h2, .table-section h2, .register-section h2 {
+            text-align: left;
+            margin-bottom: 25px;
+            color: var(--color-primary-dark);
+            font-weight: 700;
+            font-size: 22px;
+            border-bottom: 2px solid var(--color-accent-green);
+            padding-bottom: 10px;
+        }
+
+        /* ****************************************************** */
+        /* *** DISTRIBUCIÓN HORIZONTAL DE INPUTS (DENTRO DE CADA SECCIÓN) *** */
+        /* ****************************************************** */
+        .form-fields {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 20px; 
+            margin-bottom: 10px;
+        }
+
+        .field-group {
+            /* Dentro de .form-section (ficha), campos en 2 columnas */
+            flex: 1 1 calc(50% - 10px); 
+            min-width: 180px; 
+        }
+        /* Para el formulario de registro, solo 1 columna para que sea compacto */
+        .register-section .field-group {
+             flex: 1 1 100%; 
+        }
+
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        input, select { 
+            width: 100%;
+            padding: 8px; 
+            margin-bottom: 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+      /* Estilos base para todos los botones principales de las secciones de formulario */
+button[type="submit"]:not([value="editar"]):not([value="eliminar"]) {
+    width: 100%;
+    max-width: none; 
+    padding: 10px; 
+    margin-top: 15px;
+    
+    /* Colores y tipografía combinados */
+    background: var(--color-accent-green); 
+    color: var(--color-secondary-light);
+    font-weight: 600;
+
+    /* Aseguramos que no tenga borde ni contorno al hacer click/foco */
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 4px; /* Aseguramos el border-radius de los inputs/botones */
+    
+}
+
+/* Estilo para el hover */
+button[type="submit"]:not([value="editar"]):not([value="eliminar"]):hover {
+    background: var(--color-accent-green-dark);
+}
+
+/* NOTA: Eliminamos la regla ".assign-button" duplicada */
+/* Si usas la clase en el HTML, puedes incluirla como un selector adicional: */
+/* .assign-button, button[type="submit"]:not([value="editar"]):not([value="eliminar"]) { ... } */
+/* Pero para simplificar al máximo, usaremos el selector más amplio que incluye al botón */
+        /* ------------------------ */
+        /* --- 4. Estilos de Tabla --- */
+        /* ------------------------ */
+        .table-section {
+            overflow-x: auto; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 5px;
+            border: 1px solid var(--color-border-light); 
+            font-size: 14px;
+        }
+        th, td { 
+            padding: 10px; 
+            text-align: left; 
+            vertical-align: middle;
+            border: 1px solid var(--color-border-light); 
+        }
+        th { 
+            background-color: var(--color-primary-dark); 
+            color: white; 
+            font-weight: 500;
+            border-bottom: 3px solid var(--color-accent-green); 
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9; 
+        }
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        td input { 
+            border: 1px solid #ddd;
+            padding: 5px;
+            margin: 0; 
+            background: #fff;
+            width: 90%; 
+            max-width: none;
+        }
+      /* Aplicamos estilos base que comparten con los otros botones de acción */
+/* Estilos Base para TODOS los botones de la tabla */
+td button { 
+    padding: 6px 10px; 
+    margin: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    
+    /* Propiedades unificadas y sin contorno */
+    color: white; 
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+/* Estilo específico para Editar (usando la variable) */
+button[value="editar"] { 
+    background-color: var(--color-warning-orange); /* Naranja */
+}
+
+/* Estilo específico para Eliminar (usando la variable) */
+button[value="eliminar"] { 
+    background-color: var(--color-danger-red); /* Rojo */
+}
+
+/* ------------------------ */
+/* --- Mensajes de Feedback --- */
+/* ------------------------ */
+.msg-success, .error, .info {
+    /* Estilos base unificados para los mensajes */
+    padding: 12px; 
+    border-radius: 6px; 
+    margin-bottom: 15px; 
+    font-weight: 500; 
+}
+
+/* Estilo específico de Éxito */
+.msg-success { 
+    background: #e6ffe6; 
+    color: #3c763d; 
+    border: 1px solid var(--color-accent-green); 
+}
+
+/* Estilo específico de Error */
+.error { 
+    background: #fef2f2; 
+    color: var(--color-danger-red); 
+    border: 1px solid #f9bdbd; 
+}
+
+/* Estilo específico de Información */
+.info { 
+    background: #f0f8f0; 
+    color: var(--color-text-dark); 
+    border: 1px dashed var(--color-accent-green); 
+}
+
+        /* Media Query para pantallas pequeñas: apilar formularios */
+        @media (max-width: 950px) {
+            .form-container-wrapper {
+                flex-direction: column;
+                gap: 25px;
+            }
+        }
+        /* Media Query para formularios internos: apilar campos */
+        @media (max-width: 650px) {
+            .field-group {
+                flex: 1 1 100%; /* Cambia a una sola columna */
+            }
+        }
+
+    </style>
+    
+
+</head>
+<body>
+
+    <div class="header">
+        <h1>🎓 Panel de Administración CrediNet</h1>
+        <div class="logout-link">
+            <a href="/logout">Cerrar sesión ({{ session.username }})</a>
+        </div>
+    </div>
+
+    {% if msg_success %}
+        <div class="msg-success">{{ msg_success }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="dashboard-container">
+        
+        <div class="form-container-wrapper">
+            
+            <div class="form-section">
+                <h2>Crear Nueva Ficha de Crédito</h2>
+                
+                {% if not usuarios %}
+                    <p class="info">
+                        No hay usuarios registrados con rol 'ALUMNO'. Pida a los alumnos que se registren primero.
+                    </p>
+                {% else %}
+                    <form method="POST" action="/admin/crear_ficha"> 
+                        
+                        <div class="form-fields">
+                            <div class="field-group">
+                                <label for="matricula">Usuario / Matrícula</label>
+                                <select id="matricula" name="matricula" required>
+                                    <option value="">--- Seleccione un usuario registrado ---</option>
+                                    {% for usuario in usuarios %}
+                                        <option value="{{ usuario }}">{{ usuario }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="nombre">Nombre Completo del Alumno</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="carrera">Carrera</label>
+                                <input type="text" id="carrera" name="carrera" required>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="semestre">Semestre</label>
+                                <input type="number" id="semestre" name="semestre" min="1" required>
+                            </div>
+                            
+                            <div class="field-group">
+                                <label for="deuda">Monto de Deuda</label>
+                                <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
+                            </div>
+                             <div class="field-group">
+                                <label for="deuda">Huella digital</label>
+                                <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="assign-button">Asignar Ficha</button>
+                    </form>
+                {% endif %}
+            </div>
+            
+            <div class="register-section"> 
+                <h2>Crear Usuario </h2>
+                <form method="POST" action="/registro">
+                    
+                    <div class="form-fields">
+                        <div class="field-group" style="flex: 1 1 100%;">
+                            <label for="reg-username">Usuario</label>
+                            <input type="text" id="reg-username" name="username" placeholder="Usuario" required>
+                        </div>
+                        
+                        <div class="field-group" style="flex: 1 1 100%;">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" name="password" placeholder="Contraseña" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">Registrar Usuario</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="table-section"> 
+            <h2>Registros de Deudas Existentes ({{ registros | length }})</h2>
+            {% if not registros %}
+                <p class="info">Aún no hay fichas de deuda asignadas.</p>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Nombre</th>
+                            <th>Carrera</th>
+                            <th>Semestre</th>
+                            <th>Deuda</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in registros %}
+                        <tr>
+                            <form method="POST" action="/admin_dashboard">
+                                <td><input type="text" name="matricula" value="{{ alumno[0] }}" readonly></td>
+                                <td><input type="text" name="nombre" value="{{ alumno[1] }}"></td>
+                                <td><input type="text" name="carrera" value="{{ alumno[2] }}"></td>
+                                <td><input type="number" name="semestre" value="{{ alumno[3] }}"></td>
+                                <td><input type="number" step="0.01" name="deuda" value="{{ alumno[4] }}"></td>
+                                <td>
+                                    <button type="submit" name="accion" value="editar">Guardar</button>
+                                    <button type="submit" name="accion" value="eliminar">Eliminar</button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>
