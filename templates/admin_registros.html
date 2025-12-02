@@ -367,29 +367,47 @@ button[value="eliminar"] {
                             </div>
                            
 
+<div class="field-group">
+    <label for="huella">Huella digital</label>
+    <!-- Este input recibirá el último ID automáticamente y se enviará al backend -->
+    <input type="number" id="huella" name="huella" readonly>
+
+    <label for="idInput">Último ID (referencia)</label>
+    <!-- Solo visual, readonly -->
+    <input type="text" id="idInput" placeholder="Esperando ID..." readonly>
+</div>
+
 <script>
-// IP de tu ESP32 en la red
+// URL del ESP32 que devuelve el último ID
 const ESP32_URL = 'http://10.23.251.60/ultimoID';
 
-// Función para actualizar el ID
+// Función que obtiene el último ID y lo coloca en los inputs
 async function actualizarID() {
     try {
         const response = await fetch(ESP32_URL);
         if (response.ok) {
             const id = await response.text();
+
+            // Mostrar el ID en el input de referencia
             document.getElementById('idInput').value = id;
+
+            // Copiar automáticamente al input de huella digital (solo para envío)
+            document.getElementById('huella').value = id;
+        } else {
+            console.error('Error al obtener ID:', response.status);
         }
     } catch (error) {
-        console.error("No se pudo obtener el ID:", error);
+        console.error('No se pudo obtener el ID:', error);
     }
 }
 
-// Actualizar cada 2 segundos
-setInterval(actualizarID, 2000);
-
-// Opcional: actualizar inmediatamente al cargar la página
+// Ejecutar inmediatamente al cargar la página
 actualizarID();
+
+// Actualizar cada 2 segundos para mantener los inputs sincronizados
+setInterval(actualizarID, 2000);
 </script>
+
 
 
                         </div>
