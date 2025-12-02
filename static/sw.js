@@ -1,11 +1,10 @@
 const CACHE_NAME = 'credinet-v1';
 
 const ASSETS_TO_CACHE = [
-  '/',                 // homeshell.html → /
-  '/login',            // login.html → /login
-  '/deuda_alumno',   // tablero_alumno.html → /tablero_alumno
-  '/admin_registros',  // admin_registros.html → /admin_registros
-  '/manifest.json',    // manifest
+  '/',                                // Ruta principal -> Flask responde index
+  '/static/manifest.json',            // Manifest correcto
+  '/static/sw.js',                    // Service Worker
+  '/static/icons/icono-credinet.jpeg' // Ícono PWA
 ];
 
 // --- INSTALACIÓN ---
