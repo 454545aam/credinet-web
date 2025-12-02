@@ -89,6 +89,13 @@ def init_db():
     conn.close()
 
 # -------------------- RUTAS --------------------
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/json')
+
+@app.route('/sw.js')
+def service_worker():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
 
 @app.route("/")
 def home():

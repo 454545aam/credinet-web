@@ -1,0 +1,27 @@
+{
+  "name" : "CrediNet ",
+  "short_name" : "CrediNet",
+  "description" : 
+  "El proyecto CodeNova consiste en el desarrollo de una aplicación móvil enfocada en micro créditos para estudiantes, con el fin de ayudarles a pagar sus mensualidades y continuar con sus estudios. La aplicación contará con un sistema de login seguro, donde el usuario podrá acceder mediante huella digital o contraseña. El sistema mostrará los adeudos a pagar y tendrá dos tipos de perfiles: administrador y usuario. El administrador podrá visualizar todos los perfiles junto con la suma total de adeudos, además de notificar a los usuarios sobre futuras actualizaciones. El usuario podrá recuperar su cuenta mediante un método de verificación en dos pasos, y la cuenta se bloqueará automáticamente si no se utiliza durante 5 minutos.",
+  
+  "start_url" : "/homeshell.html",
+  
+  "display": "standalone",
+  
+  "theme_color": "#337ab7",
+  
+  "background_color": "#ffffff",
+  
+  "icons": [
+     {
+    "src": "/api//static/icons/icono-credinet.jpeg",
+    "sizes": "512x512",
+    "type": "image/jpeg"
+  },
+    {
+      "src": "/api/static/icons/icono-credinet.jpeg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
