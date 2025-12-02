@@ -14,14 +14,9 @@
   
   "icons": [
      {
-    "src": "/api//static/icons/icono-credinet.jpeg",
-    "sizes": "512x512",
-    "type": "image/jpeg"
-  },
-    {
-      "src": "/api/static/icons/icono-credinet.jpeg",
+      "src": "/static/icons/icono-credinet.jpeg",
       "sizes": "512x512",
-      "type": "image/png"
-    }
+      "type": "image/jpeg"
+  }
   ]
 }
