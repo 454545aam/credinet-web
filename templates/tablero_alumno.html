@@ -170,26 +170,28 @@
 </style>
 
 
-<div class="simulador">
-  <h2>Plan de Pagos Fijo</h2>
+<div class="simulador" style="display:flex; flex-direction:column; gap:25px;">
+  <div>
+    <h2>Plan de Pagos Fijo</h2>
+    <p><strong>Monto original:</strong> $35,200 MXN</p>
+    <p><strong>Interés mensual:</strong> 0.8%</p>
+    <p><strong>Plazo:</strong> 60 meses</p>
+    <p><strong>Duración de la carrera:</strong> 44 meses (solo informativo)</p>
 
-  <p><strong>Monto:</strong> $35,200 MXN</p>
-  <p><strong>Interés mensual:</strong> 0.8%</p>
-  <p><strong>Plazo:</strong> 60 meses</p>
-  <p><strong>Duración de la carrera:</strong> 44 meses (solo informativo)</p>
-
-  
+    <p><strong>Estatus:</strong> <span id="estatusPago">Pendiente</span></p>
+  </div>
 
   <div id="resultado"></div>
 </div>
 
-
 <script>
- const resultadoDiv = document.getElementById('resultado');
+  const resultadoDiv = document.getElementById('resultado');
 
   function calcularPlan() {
-    const capital = 35200;
-    const tasa = 0.5 / 100;
+    // Tomar la deuda desde el contenido de la deuda-box
+    const deudaTexto = document.querySelector('.deuda-box .monto').textContent;
+    const capital = Number(deudaTexto.replace(/[^0-9.-]+/g, ""));
+    const tasa = 0.8 / 100;
     const meses = 60;
 
     let saldo = capital;
@@ -228,6 +230,9 @@
 
     tablaHTML += `</table></div>`;
     resultadoDiv.innerHTML = tablaHTML;
+
+    // Actualizar estatus según deuda
+    document.getElementById('estatusPago').textContent = (capital === 0 ? 'Pagado' : 'Pendiente');
   }
 
   // Ejecutar automáticamente al cargar
