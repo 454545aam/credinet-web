@@ -360,28 +360,37 @@ button[value="eliminar"] {
                             </div>
                              <div class="field-group">
                                 <label for="deuda">Huella digital</label>
-                                <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
-                                <input type="text" id="idInput" placeholder="Último ID">
+    <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
+
+    <label for="idInput">Último ID</label>
+    <input type="text" id="idInput" placeholder="Esperando ID..." readonly>
                             </div>
-                            
+                           
 
 <script>
+// IP de tu ESP32 en la red
+const ESP32_URL = 'http://10.23.251.60/ultimoID';
+
+// Función para actualizar el ID
 async function actualizarID() {
     try {
-        // Cambia la IP por la del ESP32 en tu red
-        let response = await fetch('http://10.23.251.60/ultimoID');
+        const response = await fetch(ESP32_URL);
         if (response.ok) {
-            let id = await response.text();
+            const id = await response.text();
             document.getElementById('idInput').value = id;
         }
-    } catch (err) {
-        console.log("Error al obtener el ID:", err);
+    } catch (error) {
+        console.error("No se pudo obtener el ID:", error);
     }
 }
 
 // Actualizar cada 2 segundos
 setInterval(actualizarID, 2000);
+
+// Opcional: actualizar inmediatamente al cargar la página
+actualizarID();
 </script>
+
 
                         </div>
 
