@@ -186,7 +186,7 @@
     <p><strong>Monto original:</strong> <span id="montoOriginal">$35,200</span> MXN</p>
     <p><strong>Interés mensual:</strong> 0.5%</p>
     <p><strong>Plazo:</strong> 60 meses</p>
-    <p><strong>Duración de la carrera:</strong> 44 meses (solo informativo)</p>
+    <p><strong>Duración de la carrera:</strong> 44 meses </p>
   </div>
 
   <div id="resultado"></div>
@@ -195,25 +195,27 @@
 
 
 <script>
-  const resultadoDiv = document.getElementById('resultado');
+ 
+const resultadoDiv = document.getElementById('resultado');
 
-  function calcularPlan() {
-    const deudaBox = document.querySelector('.deuda-box .monto');
-    if (!deudaBox) {
-      setTimeout(calcularPlan, 100);
-      return;
-    }
+function calcularPlan() {
+  // Tomar la deuda desde el contenido de la deuda-box
+  const deudaBox = document.querySelector('.deuda-box .monto');
+  if (!deudaBox) {
+    setTimeout(calcularPlan, 100);
+    return;
+  }
 
-    const deudaTexto = deudaBox.textContent;
-    const deudaPendiente = Number(deudaTexto.replace(/[^0-9.-]+/g, ""));
-    const capitalOriginal = 35200;
-    document.getElementById('montoOriginal').textContent = `$${capitalOriginal.toLocaleString()}`;
+  const deudaTexto = deudaBox.textContent;
+  const deudaPendiente = Number(deudaTexto.replace(/[^0-9.-]+/g, ""));
+  const capitalOriginal = 35200;
+  document.getElementById('montoOriginal').textContent = `$${capitalOriginal.toLocaleString()}`;
 
-    const tasa = 0.5 / 100;
-    const meses = 60;
+  const tasa = 0.5 / 100;
+  const meses = 60;
 
-    let saldo = capitalOriginal;
-    let tablaHTML = `
+  let saldo = capitalOriginal;
+  let tablaHTML = `
     <div style="overflow-x:auto; white-space:nowrap;">
       <table style="display:inline-block; width:auto;">
         <tr>
@@ -224,49 +226,52 @@
           <th>Capital Restante</th>
           <th>Estatus</th>
         </tr>
-    `;
+  `;
 
-    const pagoMensual = (capitalOriginal * tasa) / (1 - Math.pow(1 + tasa, -meses));
-    let deudaCubierta = capitalOriginal - deudaPendiente;
-    let pagoAcumulado = 0;
+  const pagoMensual = (capitalOriginal * tasa) / (1 - Math.pow(1 + tasa, -meses));
+  let deudaRestante = deudaPendiente;
 
-    for (let mes = 1; mes <= meses; mes++) {
-      const interes = saldo * tasa;
-      let capitalPagado = pagoMensual - interes;
-      let capitalInicioMes = saldo;
-      saldo -= capitalPagado;
-      if (saldo < 0) saldo = 0;
+  for (let mes = 1; mes <= meses; mes++) {
+    const interes = saldo * tasa;
+    let capitalPagado = pagoMensual - interes;
+    let capitalInicioMes = saldo;
+    saldo -= capitalPagado;
+    if (saldo < 0) saldo = 0;
 
-      pagoAcumulado += capitalPagado;
-
-      // Determinar estatus mensual según pago acumulado y deuda pendiente
-      let estatus, claseEstatus;
-      if (pagoAcumulado >= deudaCubierta) {
-        estatus = 'Pagado';
-        claseEstatus = 'pagado';
-      } else {
-        estatus = 'Pendiente';
-        claseEstatus = 'pendiente';
-      }
-
-      tablaHTML += `
-        <tr>
-          <td>${mes}</td>
-          <td>${capitalInicioMes.toFixed(2)}</td>
-          <td>${interes.toFixed(2)}</td>
-          <td>${pagoMensual.toFixed(2)}</td>
-          <td>${saldo.toFixed(2)}</td>
-          <td class="${claseEstatus}">${estatus}</td>
-        </tr>
-      `;
+    // Determinar estatus mensual según deuda restante
+    let estatus, claseEstatus;
+    if (deudaRestante <= 0) {
+      estatus = 'Pagado';
+      claseEstatus = 'pagado';
+    } else {
+      estatus = 'Pendiente';
+      claseEstatus = 'pendiente';
     }
 
-    tablaHTML += `</table></div>`;
-    resultadoDiv.innerHTML = tablaHTML;
+    deudaRestante -= capitalPagado; // Reducimos la deuda pendiente según pago del mes
+
+    // Agregar la fila de la tabla dentro del bucle
+    tablaHTML += `
+      <tr>
+        <td>${mes}</td>
+        <td>${capitalInicioMes.toFixed(2)}</td>
+        <td>${interes.toFixed(2)}</td>
+        <td>${pagoMensual.toFixed(2)}</td>
+        <td>${saldo.toFixed(2)}</td>
+        <td class="${claseEstatus}">${estatus}</td>
+      </tr>
+    `;
   }
 
-  window.onload = calcularPlan;
+  tablaHTML += `</table></div>`;
+  resultadoDiv.innerHTML = tablaHTML;
+}
+
+// Ejecutar automáticamente al cargar
+window.onload = calcularPlan;
+
 </script>
+
 
 </body>
 </html>
