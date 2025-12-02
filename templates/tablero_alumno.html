@@ -7,11 +7,13 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+           display: flex;
+    flex-direction: column; /* Esto hace que los divs estén uno sobre otro */
+    justify-content: flex-start; /* Opcional: alinea los divs desde arriba */
+    align-items: center; /* Centra horizontalmente */
+    min-height: 100vh;
+    margin: 0;
+    gap: 30px; /* Espacio vertical entre divs */
         }
         .dashboard-card {
             background: #ffffff;
@@ -190,6 +192,8 @@
   <div id="resultado"></div>
 </div>
 
+
+
 <script>
   const resultadoDiv = document.getElementById('resultado');
 
@@ -224,6 +228,7 @@
 
     const pagoMensual = (capitalOriginal * tasa) / (1 - Math.pow(1 + tasa, -meses));
     let deudaCubierta = capitalOriginal - deudaPendiente;
+    let pagoAcumulado = 0;
 
     for (let mes = 1; mes <= meses; mes++) {
       const interes = saldo * tasa;
@@ -232,9 +237,11 @@
       saldo -= capitalPagado;
       if (saldo < 0) saldo = 0;
 
-      // Determinar estatus mensual según deuda cubierta
+      pagoAcumulado += capitalPagado;
+
+      // Determinar estatus mensual según pago acumulado y deuda pendiente
       let estatus, claseEstatus;
-      if (deudaCubierta >= capitalInicioMes) {
+      if (pagoAcumulado >= deudaCubierta) {
         estatus = 'Pagado';
         claseEstatus = 'pagado';
       } else {
