@@ -242,10 +242,10 @@
       // Determinar estatus mensual según pago acumulado y deuda pendiente
       let estatus, claseEstatus;
       if (pagoAcumulado >= deudaCubierta) {
-        estatus = 'Pagado';
+        estatus = 'Pendiente';
         claseEstatus = 'pagado';
       } else {
-        estatus = 'Pendiente';
+        estatus = 'Pagado';
         claseEstatus = 'pendiente';
       }
 
