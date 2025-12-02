@@ -167,18 +167,25 @@
   th {
     background: #eee;
   }
+  .pagado {
+    color: green;
+    font-weight: bold;
+  }
+  .pendiente {
+    color: red;
+    font-weight: bold;
+  }
 </style>
-
+</head>
+<body>
 
 <div class="simulador" style="display:flex; flex-direction:column; gap:25px;">
   <div>
     <h2>Plan de Pagos Fijo</h2>
-    <p><strong>Monto original:</strong> $35,200 MXN</p>
-    <p><strong>Interés mensual:</strong> 0.8%</p>
+    <p><strong>Monto original:</strong> <span id="montoOriginal">$35,200</span> MXN</p>
+    <p><strong>Interés mensual:</strong> 0.5%</p>
     <p><strong>Plazo:</strong> 60 meses</p>
     <p><strong>Duración de la carrera:</strong> 44 meses (solo informativo)</p>
-
-    <p><strong>Estatus:</strong> <span id="estatusPago">Pendiente</span></p>
   </div>
 
   <div id="resultado"></div>
@@ -188,13 +195,21 @@
   const resultadoDiv = document.getElementById('resultado');
 
   function calcularPlan() {
-    // Tomar la deuda desde el contenido de la deuda-box
-    const deudaTexto = document.querySelector('.deuda-box .monto').textContent;
-    const capital = Number(deudaTexto.replace(/[^0-9.-]+/g, ""));
-    const tasa = 0.8 / 100;
+    const deudaBox = document.querySelector('.deuda-box .monto');
+    if (!deudaBox) {
+      setTimeout(calcularPlan, 100);
+      return;
+    }
+
+    const deudaTexto = deudaBox.textContent;
+    const deudaPendiente = Number(deudaTexto.replace(/[^0-9.-]+/g, ""));
+    const capitalOriginal = 35200;
+    document.getElementById('montoOriginal').textContent = `$${capitalOriginal.toLocaleString()}`;
+
+    const tasa = 0.5 / 100;
     const meses = 60;
 
-    let saldo = capital;
+    let saldo = capitalOriginal;
     let tablaHTML = `
     <div style="overflow-x:auto; white-space:nowrap;">
       <table style="display:inline-block; width:auto;">
@@ -204,43 +219,41 @@
           <th>Interés</th>
           <th>Pago</th>
           <th>Capital Restante</th>
+          <th>Estatus</th>
         </tr>
     `;
 
-    const pagoMensual = (capital * tasa) / (1 - Math.pow(1 + tasa, -meses));
+    const pagoMensual = (capitalOriginal * tasa) / (1 - Math.pow(1 + tasa, -meses));
 
     for (let mes = 1; mes <= meses; mes++) {
       const interes = saldo * tasa;
       let capitalPagado = pagoMensual - interes;
+      let capitalInicioMes = saldo;
       saldo -= capitalPagado;
       if (saldo < 0) saldo = 0;
+
+      // Determinar estatus según deuda pendiente actual
+      const estatus = deudaPendiente === 0 ? 'Pagado' : (saldo <= deudaPendiente ? 'Pendiente' : 'Pagado');
+      const claseEstatus = estatus === 'Pagado' ? 'pagado' : 'pendiente';
 
       tablaHTML += `
         <tr>
           <td>${mes}</td>
-          <td>${(saldo + capitalPagado).toFixed(2)}</td>
+          <td>${capitalInicioMes.toFixed(2)}</td>
           <td>${interes.toFixed(2)}</td>
           <td>${pagoMensual.toFixed(2)}</td>
           <td>${saldo.toFixed(2)}</td>
+          <td class="${claseEstatus}">${estatus}</td>
         </tr>
       `;
-
-      if (saldo === 0) break;
     }
 
     tablaHTML += `</table></div>`;
     resultadoDiv.innerHTML = tablaHTML;
-
-    // Actualizar estatus según deuda
-    document.getElementById('estatusPago').textContent = (capital === 0 ? 'Pagado' : 'Pendiente');
   }
 
-  // Ejecutar automáticamente al cargar
   window.onload = calcularPlan;
 </script>
-
-
-
 
 </body>
 </html>
