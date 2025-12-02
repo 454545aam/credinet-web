@@ -168,8 +168,7 @@
     background: #eee;
   }
 </style>
-</head>
-<body>
+
 
 <div class="simulador">
   <h2>Plan de Pagos Fijo</h2>
@@ -184,34 +183,57 @@
   <div id="resultado"></div>
 </div>
 
+
 <script>
-  const calcularBtn = document.getElementById('calcular');
-  const resultadoDiv = document.getElementById('resultado');
+ const resultadoDiv = document.getElementById('resultado');
 
   function calcularPlan() {
     const capital = 35200;
-    const tasa = 0.8 / 100;
+    const tasa = 0.5 / 100;
     const meses = 60;
 
     let saldo = capital;
     let tablaHTML = `
-      <div style="overflow-x:auto; white-space:nowrap;">
-  <table style="display:inline-block; width:auto;">
-    <tr>
-      <th>Mes</th>
-      <th>Capital Inicial</th>
-      <th>Interés</th>
-      <th>Pago</th>
-      <th>Capital Restante</th>
-    </tr>
-    <!-- Las filas se generarán dinámicamente -->
-  </table>
-</div>`;
+    <div style="overflow-x:auto; white-space:nowrap;">
+      <table style="display:inline-block; width:auto;">
+        <tr>
+          <th>Mes</th>
+          <th>Capital Inicial</th>
+          <th>Interés</th>
+          <th>Pago</th>
+          <th>Capital Restante</th>
+        </tr>
+    `;
+
+    const pagoMensual = (capital * tasa) / (1 - Math.pow(1 + tasa, -meses));
+
+    for (let mes = 1; mes <= meses; mes++) {
+      const interes = saldo * tasa;
+      let capitalPagado = pagoMensual - interes;
+      saldo -= capitalPagado;
+      if (saldo < 0) saldo = 0;
+
+      tablaHTML += `
+        <tr>
+          <td>${mes}</td>
+          <td>${(saldo + capitalPagado).toFixed(2)}</td>
+          <td>${interes.toFixed(2)}</td>
+          <td>${pagoMensual.toFixed(2)}</td>
+          <td>${saldo.toFixed(2)}</td>
+        </tr>
+      `;
+
+      if (saldo === 0) break;
+    }
+
+    tablaHTML += `</table></div>`;
     resultadoDiv.innerHTML = tablaHTML;
   }
 
-  
+  // Ejecutar automáticamente al cargar
+  window.onload = calcularPlan;
 </script>
+
 
 
 
