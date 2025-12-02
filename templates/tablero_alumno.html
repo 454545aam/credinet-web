@@ -137,50 +137,49 @@
 
 
 
-  
- <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f0f2f5;
-    }
-    .simulador {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    input[type="range"], input[type="number"] {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      padding: 8px;
-      text-align: right;
-    }
-    th {
-      background: #eee;
-    }
-  </style>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f0f2f5;
+  }
+  .simulador {
+    max-width: 600px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  table, th, td {
+    border: 1px solid #ccc;
+  }
+  th, td {
+    padding: 8px;
+    text-align: right;
+  }
+  th {
+    background: #eee;
+  }
+</style>
+</head>
+<body>
+
 <div class="simulador">
-  <h2>Plan de Pagos </h2>
+  <h2>Plan de Pagos Fijo</h2>
 
   <p><strong>Monto:</strong> $35,200 MXN</p>
   <p><strong>Interés mensual:</strong> 0.8%</p>
   <p><strong>Plazo:</strong> 60 meses</p>
   <p><strong>Duración de la carrera:</strong> 44 meses (solo informativo)</p>
 
-  <button id="calcular">Calcular plan de pagos</button>
+  
 
   <div id="resultado"></div>
 </div>
@@ -196,43 +195,24 @@
 
     let saldo = capital;
     let tablaHTML = `
-      <table>
-        <tr>
-          <th>Mes</th>
-          <th>Capital Inicial</th>
-          <th>Interés</th>
-          <th>Pago</th>
-          <th>Capital Restante</th>
-        </tr>
-    `;
-
-    const pagoMensual = (capital * tasa) / (1 - Math.pow(1 + tasa, -meses));
-
-    for (let mes = 1; mes <= meses; mes++) {
-      const interes = saldo * tasa;
-      let capitalPagado = pagoMensual - interes;
-      saldo -= capitalPagado;
-      if (saldo < 0) saldo = 0;
-
-      tablaHTML += `
-        <tr>
-          <td>${mes}</td>
-          <td>${(saldo + capitalPagado).toFixed(2)}</td>
-          <td>${interes.toFixed(2)}</td>
-          <td>${pagoMensual.toFixed(2)}</td>
-          <td>${saldo.toFixed(2)}</td>
-        </tr>
-      `;
-
-      if (saldo === 0) break;
-    }
-
-    tablaHTML += `</table>`;
+      <div style="overflow-x:auto; white-space:nowrap;">
+  <table style="display:inline-block; width:auto;">
+    <tr>
+      <th>Mes</th>
+      <th>Capital Inicial</th>
+      <th>Interés</th>
+      <th>Pago</th>
+      <th>Capital Restante</th>
+    </tr>
+    <!-- Las filas se generarán dinámicamente -->
+  </table>
+</div>`;
     resultadoDiv.innerHTML = tablaHTML;
   }
 
-  calcularBtn.addEventListener('click', calcularPlan);
+  
 </script>
+
 
 
 </body>
