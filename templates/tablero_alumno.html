@@ -137,7 +137,6 @@
 
 
 
-
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -224,6 +223,7 @@
     `;
 
     const pagoMensual = (capitalOriginal * tasa) / (1 - Math.pow(1 + tasa, -meses));
+    let deudaCubierta = capitalOriginal - deudaPendiente;
 
     for (let mes = 1; mes <= meses; mes++) {
       const interes = saldo * tasa;
@@ -232,9 +232,15 @@
       saldo -= capitalPagado;
       if (saldo < 0) saldo = 0;
 
-      // Determinar estatus según deuda pendiente actual
-      const estatus = deudaPendiente === 0 ? 'Pagado' : (saldo <= deudaPendiente ? 'Pendiente' : 'Pagado');
-      const claseEstatus = estatus === 'Pagado' ? 'pagado' : 'pendiente';
+      // Determinar estatus mensual según deuda cubierta
+      let estatus, claseEstatus;
+      if (deudaCubierta >= capitalInicioMes) {
+        estatus = 'Pagado';
+        claseEstatus = 'pagado';
+      } else {
+        estatus = 'Pendiente';
+        claseEstatus = 'pendiente';
+      }
 
       tablaHTML += `
         <tr>
