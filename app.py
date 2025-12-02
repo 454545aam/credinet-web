@@ -162,18 +162,42 @@ def registro():
 def ver_deuda_alumno():
     if 'user_id' not in session or session.get('rol') != "ALUMNO":
         return redirect(url_for("login"))
+
     matricula = session.get("username")
+
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT nombre, deuda FROM alumnos WHERE matricula=%s", (matricula,))
+
+    # Traemos TODA la información
+    cur.execute("""
+        SELECT nombre, carrera, semestre, deuda
+        FROM alumnos 
+        WHERE matricula=%s
+    """, (matricula,))
+
     deuda_registro = cur.fetchone()
+
     cur.close()
     conn.close()
+
     if deuda_registro:
-        nombre_alumno, deuda_monto = deuda_registro
-        return render_template("tablero_alumno.html", nombre=nombre_alumno, deuda=deuda_monto, matricula=matricula, now=datetime.now)
+        nombre_alumno, carrera, semestre, deuda_monto = deuda_registro
+        return render_template("tablero_alumno.html",
+                               nombre=nombre_alumno,
+                               carrera=carrera,
+                               semestre=semestre,
+                               deuda=deuda_monto,
+                               matricula=matricula,
+                               now=datetime.now)
     else:
-        return render_template("tablero_alumno.html", nombre=matricula, deuda=0.00, matricula=matricula, msg="Ficha de deuda pendiente.", now=datetime.now)
+        return render_template("tablero_alumno.html",
+                               nombre=matricula,
+                               carrera="N/A",
+                               semestre="N/A",
+                               deuda=0.00,
+                               matricula=matricula,
+                               msg="Ficha de deuda pendiente.",
+                               now=datetime.now)
 
 @app.route("/admin_dashboard", methods=["GET", "POST"])
 def admin_dashboard():

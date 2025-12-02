@@ -15,7 +15,7 @@
   "icons": [
      {
       "src": "/static/icons/icono-credinet.jpeg",
-      "sizes": "512x512",
+      "sizes": "1024x1024",
       "type": "image/jpeg"
   }
   ]
