@@ -299,8 +299,6 @@ button[value="eliminar"] {
 
 </head>
 <body>
-<input type="number" id="huella" name="huella" readonly>
-<input type="text" id="idInput" placeholder="Esperando ID..." readonly>
 
     <div class="header">
         <h1>🎓 Panel de Administración CrediNet</h1>
@@ -360,39 +358,12 @@ button[value="eliminar"] {
                                 <label for="deuda">Monto de Deuda</label>
                                 <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
                             </div>
-                             
+                             <div class="field-group">
+                                <label for="deuda">Huella digital</label>
+                                <input type="number" id="deuda" name="deuda" min="0" step="0.01" required>
+                                <input type="text" id="idInput" placeholder="Último ID">
+                            </div>
                            
-
-<script>
-// URL del ESP32 que devuelve el último ID
-const ESP32_URL = 'http://10.23.251.60/ultimoID';
-
-// Función que obtiene el último ID y lo coloca en los inputs
-async function actualizarID() {
-    try {
-        const response = await fetch(ESP32_URL);
-        if (response.ok) {
-            const id = await response.text();
-
-            // Mostrar el ID en el input de referencia
-            document.getElementById('idInput').value = id;
-
-            // Copiar automáticamente al input de huella digital (solo para envío)
-            document.getElementById('huella').value = id;
-        } else {
-            console.error('Error al obtener ID:', response.status);
-        }
-    } catch (error) {
-        console.error('No se pudo obtener el ID:', error);
-    }
-}
-
-// Ejecutar inmediatamente al cargar la página
-actualizarID();
-
-// Actualizar cada 2 segundos para mantener los inputs sincronizados
-setInterval(actualizarID, 2000);
-</script>
 
 
 
