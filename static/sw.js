@@ -1,7 +1,8 @@
-const CACHE_NAME = 'credinet-v1';
+const CACHE_NAME = 'credinet-v2';
 
 const ASSETS_TO_CACHE = [
-  '/',                                // Ruta principal -> Flask responde index
+  '/', 
+  '/templates/homeshell.html',                               // Ruta principal -> Flask responde index
   '/static/manifest.json',            // Manifest correcto
   '/static/sw.js',                    // Service Worker
   '/static/icons/icono-credinet.jpeg' // Ícono PWA
